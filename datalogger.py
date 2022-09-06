@@ -12,7 +12,7 @@ class PulseDataLogger:
 		self.onData = onData
 		self.previous = None
 	
-	def recordPulse(self):
+	async def recordPulse(self):
 		previous = self.previous
 		datum = {
 			'counter': self.counter,
@@ -22,4 +22,4 @@ class PulseDataLogger:
 		datum['secondsSincePrevious'] = datum['timestamp'] - previous['timestamp'] if previous != None else None
 		self.previous = datum
 		print('passing datum to sink')
-		self.onData(datum)
+		await self.onData(datum)
