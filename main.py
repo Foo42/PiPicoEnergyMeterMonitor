@@ -1,8 +1,8 @@
 from datalogger import PulseDataLogger
 from datasink import MqttDataSink
 import network, rp2, time, ntptime, json, machine
+from pulsedetector import PinPulseDetector
 from credentials import wifi_password, wifi_ssid
-import queue
 import uasyncio
 
 from umqttsimple import MQTTClient
@@ -69,10 +69,12 @@ async def main():
 
 	data_logger = PulseDataLogger(onData=data_sink.sendGasPulse)
 	
-	while True:
-		print('main loop sending pulse')
-		await data_logger.recordPulse()
-		await uasyncio.sleep_ms(10000)
+	pulse_detector = PinPulseDetector(data_logger.recordPulse)
+	await uasyncio.create_task(pulse_detector.run())
+	# while True:
+	# 	print('main loop sending pulse')
+	# 	await data_logger.recordPulse()
+	# 	await uasyncio.sleep_ms(10000)
 
 
 uasyncio.run(main())

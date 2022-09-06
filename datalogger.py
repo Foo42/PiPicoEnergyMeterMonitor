@@ -1,4 +1,4 @@
-import time
+import time, utime
 
 def make_timestamp():
 	timestamp = time.time()
@@ -11,6 +11,7 @@ class PulseDataLogger:
 		self.counter = 0
 		self.onData = onData
 		self.previous = None
+		self.previous_ticks = None
 	
 	async def recordPulse(self):
 		previous = self.previous
@@ -19,7 +20,9 @@ class PulseDataLogger:
 			'timestamp': make_timestamp(),
 		}
 		self.counter += 1
-		datum['secondsSincePrevious'] = datum['timestamp'] - previous['timestamp'] if previous != None else None
+		ticks_ms = utime.ticks_ms()
+		datum['msSincePrevious'] = ticks_ms - self.previous_ticks if self.previous_ticks != None else None
+		self.previous_ticks = ticks_ms
 		self.previous = datum
 		print('passing datum to sink')
 		await self.onData(datum)
